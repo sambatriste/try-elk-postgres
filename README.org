@@ -1,0 +1,31 @@
+
+- [[https://www.elastic.co/jp/blog/how-to-keep-elasticsearch-synchronized-with-a-relational-database-using-logstash][LogstashおよびJDBCを使用してElasticsearchとリレーショナルデータベースの同期を維持する方法]]
+- [[https://www.elastic.co/guide/en/logstash/current/plugins-inputs-jdbc.html][Jdbc input plugin | Logstash Reference 7.8 | Elastic]]
+- [[https://qiita.com/takayuki-miura0203/items/ba9d59a8b267d785d0c6][Dockerで、DatabaseからElasticsearchにLogstashを使ってデータを流してみた]]
+
+#+BEGIN_SRC sh
+docker-compose up
+#+END_SRC
+
+#+BEGIN_SRC sh
+curl -X GET "localhost:9200/zipcode/_search?pretty" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "match": {
+      "city": "門真"
+    }
+  }
+}
+'
+#+END_SRC
+
+
+** Kibana
+
+http://localhost:5601
+
+** PostgreSQL
+
+#+BEGIN_SRC sh
+docker container exec -it postgres psql -U postgres -d postgres
+#+END_SRC

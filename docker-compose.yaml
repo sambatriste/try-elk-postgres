@@ -1,0 +1,50 @@
+version: "3"
+
+services:
+  elasticsearch:
+    build:
+      context: ./elasticsearch
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+    volumes:
+      - ./elasticsearch/es-data:/usr/share/elasticsearch/data
+
+  logstash:
+    build:
+      context: ./logstash
+    container_name: logstash
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - ./logstash/log:/var/log
+    depends_on:
+      - elasticsearch
+      - postgres
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.8.0
+    container_name: kibana
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+
+  postgres:
+    image: postgres:12.3
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgresql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d

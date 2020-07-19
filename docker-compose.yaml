@@ -4,7 +4,9 @@ services:
   elasticsearch:
     build:
       context: ./elasticsearch
+    image: sambatriste/elasticsearch-with-kuromoji
     container_name: elasticsearch
+    restart: always
     environment:
       - discovery.type=single-node
       - cluster.name=docker-cluster
@@ -16,16 +18,15 @@ services:
         hard: -1
     ports:
       - 9200:9200
-    volumes:
-      - ./elasticsearch/es-data:/usr/share/elasticsearch/data
 
   logstash:
-    build:
-      context: ./logstash
+    image: docker.elastic.co/logstash/logstash:7.8.0
     container_name: logstash
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline
-      - ./logstash/log:/var/log
+      - ./logstash/logs:/usr/share/logstash/logs
+      - ./logstash/jdbc:/opt/jdbc
+      - ./logstash/metadata:/usr/share/logstash/metadata
     depends_on:
       - elasticsearch
       - postgres
